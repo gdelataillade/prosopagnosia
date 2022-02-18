@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:prosopagnosia/presentation/avatar_painter.dart';
@@ -86,18 +87,27 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   final random = Random();
+  late String avatarName;
   List<Map<String, dynamic>> puzzle = [];
   late int blankIndex;
   bool isSolved = false;
 
+  int? shiftingIndex;
+  double xShift = 0;
+  double yShift = 0;
+
   Future<void> generateNewPuzzle() async {
-    final randomAvatar = await DrawableTools.generateRandomAvatar();
+    avatarName = Faker().person.firstName();
+
+    final randomAvatar = await DrawableTools.generateRandomAvatar(avatarName);
     final splittedAvatar = await DrawableTools.splitAvatar(randomAvatar);
 
     puzzle.clear();
     blankIndex = 8;
 
     setState(() {
+      isSolved = false;
+
       for (int i = 0; i < 9; i++) {
         puzzle.add(
           {
@@ -107,7 +117,6 @@ class _GameState extends State<Game> {
         );
       }
 
-      // puzzle.shuffle();
       shufflePuzzle();
 
       if (puzzle[blankIndex]["index"] != 8) {
@@ -159,14 +168,19 @@ class _GameState extends State<Game> {
       if (puzzle[i]["index"] != i) return;
     }
     isSolved = true;
+    Storage.storeNewAvatar(avatarName);
     print("PUZZLE SOLVED!");
   }
 
   void onTap(int index) {
     if (isNextToBlank(index)) {
       setState(() {
-        swapTiles(index, blankIndex);
-        checkWin();
+        if (index + 1 == blankIndex) xShift = 198;
+        if (index - 1 == blankIndex) xShift = -198;
+        if (index + 3 == blankIndex) yShift = 198;
+        if (index - 3 == blankIndex) yShift = -198;
+
+        shiftingIndex = index;
       });
     }
   }
@@ -187,20 +201,43 @@ class _GameState extends State<Game> {
             width: tileSize,
             child: puzzle.isEmpty
                 ? const SizedBox.shrink()
-                : GridView.count(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 3,
-                    crossAxisSpacing: 3,
-                    children: [
-                      for (var i = 0; i < 9; i++)
-                        blankIndex == i
-                            ? const SizedBox.expand()
-                            : PuzzleTile(
-                                image: Image(image: puzzle[i]["image"].image),
-                                onPressed: () => onTap(i),
+                : isSolved
+                    ? PuzzleSolved(name: avatarName)
+                    : SizedBox(
+                        height: 600,
+                        width: 600,
+                        child: Stack(
+                          children: [
+                            for (int i = 0; i < 9; i++)
+                              AnimatedPositioned(
+                                top: 200 * (i ~/ 3).toDouble() +
+                                    (shiftingIndex != null && shiftingIndex == i
+                                        ? yShift
+                                        : 0),
+                                left: 200 * (i % 3).toDouble() +
+                                    (shiftingIndex != null && shiftingIndex == i
+                                        ? xShift
+                                        : 0),
+                                onEnd: () => setState(() {
+                                  shiftingIndex = null;
+                                  xShift = 0;
+                                  yShift = 0;
+                                  swapTiles(i, blankIndex);
+                                  checkWin();
+                                }),
+                                curve: Curves.fastOutSlowIn,
+                                duration: const Duration(milliseconds: 150),
+                                child: blankIndex == i
+                                    ? const SizedBox()
+                                    : PuzzleTile(
+                                        image: Image(
+                                            image: puzzle[i]["image"].image),
+                                        onPressed: () => onTap(i),
+                                      ),
                               ),
-                    ],
-                  ),
+                          ],
+                        ),
+                      ),
           ),
         ),
         const SizedBox(height: 60),
@@ -213,6 +250,19 @@ class _GameState extends State<Game> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class PuzzleSolved extends StatelessWidget {
+  final String name;
+
+  const PuzzleSolved({Key? key, required this.name}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Puzzle solved! You unlocked $name"),
     );
   }
 }

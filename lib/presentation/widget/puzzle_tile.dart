@@ -12,17 +12,22 @@ class PuzzleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.all(5),
-        elevation: 2,
-        primary: const Color(0xFF925001),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: image,
+    return SizedBox(
+      height: 198,
+      width: 198,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(5),
+          elevation: 2,
+          primary: const Color(0xFF925001),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: image,
+        ),
       ),
     );
   }

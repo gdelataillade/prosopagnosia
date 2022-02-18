@@ -15,9 +15,7 @@ class DrawableTools {
     return avatar;
   }
 
-  static Future<DrawableRoot> generateRandomAvatar() async {
-    final name =
-        DateTime.fromMillisecondsSinceEpoch(DateTime.now().second).toString();
+  static Future<DrawableRoot> generateRandomAvatar(String name) async {
     String svgCode = multiavatar(name, trBackground: true);
     DrawableRoot avatar = await svg.fromSvgString(svgCode, name);
 
