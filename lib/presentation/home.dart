@@ -87,7 +87,7 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   final random = Random();
   List<Map<String, dynamic>> puzzle = [];
-  int? blankIndex;
+  late int blankIndex;
   bool isSolved = false;
 
   Future<void> generateNewPuzzle() async {
@@ -107,23 +107,39 @@ class _GameState extends State<Game> {
         );
       }
 
-      puzzle.shuffle();
+      // puzzle.shuffle();
+      shufflePuzzle();
 
-      if (puzzle[blankIndex!]["index"] != 8) {
+      if (puzzle[blankIndex]["index"] != 8) {
         final lastTile =
             puzzle.where((tile) => tile["index"] == blankIndex).first;
         final lastTileIndex = puzzle.indexOf(lastTile);
-        final otherTile = puzzle[blankIndex!];
+        final otherTile = puzzle[blankIndex];
 
-        puzzle[blankIndex!] = lastTile;
+        puzzle[blankIndex] = lastTile;
         puzzle[lastTileIndex] = otherTile;
       }
     });
   }
 
-  // List<Map<String, dynamic>> shufflePuzzle(List<Map<String, dynamic>> list) {
+  void swapTiles(int tileIndex, int blankIdx) {
+    final tmp = puzzle[tileIndex];
 
-  // }
+    puzzle[tileIndex] = puzzle[blankIdx];
+    puzzle[blankIdx] = tmp;
+    blankIndex = tileIndex;
+  }
+
+  void shufflePuzzle() {
+    for (int i = 0; i < 30; i++) {
+      int index = random.nextInt(8);
+
+      while (!isNextToBlank(index)) {
+        index = random.nextInt(8);
+      }
+      swapTiles(index, blankIndex);
+    }
+  }
 
   bool isNextToBlank(int index) {
     if (index + 1 == blankIndex && blankIndex != 3 && blankIndex != 6) {
@@ -138,18 +154,19 @@ class _GameState extends State<Game> {
     return false;
   }
 
+  void checkWin() {
+    for (int i = 0; i < 9; i++) {
+      if (puzzle[i]["index"] != i) return;
+    }
+    isSolved = true;
+    print("PUZZLE SOLVED!");
+  }
+
   void onTap(int index) {
     if (isNextToBlank(index)) {
-      final tmp = puzzle[blankIndex!];
-
       setState(() {
-        puzzle[blankIndex!] = puzzle[index];
-        puzzle[index] = tmp;
-        blankIndex = index;
-
-        for (int i = 0; i < 9; i++) {
-          if (puzzle[i]["index"] != i) return;
-        }
+        swapTiles(index, blankIndex);
+        checkWin();
       });
     }
   }
