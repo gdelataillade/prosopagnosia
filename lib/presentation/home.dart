@@ -35,8 +35,9 @@ class Trophies extends StatefulWidget {
 
 class _TrophiesState extends State<Trophies> {
   List<DrawableRoot> svgRoots = [];
+  List<String> names = [];
 
-  Future<void> generateAvatars(List<String> names) async {
+  Future<void> generateAvatars() async {
     List<DrawableRoot> tmp = [];
 
     for (var i = 0; i < names.length; i++) {
@@ -50,8 +51,8 @@ class _TrophiesState extends State<Trophies> {
   void initState() {
     super.initState();
     // Storage.storeNewAvatar("3");
-    final names = Storage.getStoredAvatar();
-    generateAvatars(names);
+    names = Storage.getStoredAvatar();
+    generateAvatars();
   }
 
   @override
@@ -61,17 +62,22 @@ class _TrophiesState extends State<Trophies> {
         : Row(
             children: [
               for (var i = 0; i < svgRoots.length; i++)
-                Container(
-                  height: 80,
-                  width: 80,
-                  margin: const EdgeInsets.only(left: 10.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: CustomPaint(
-                    painter: AvatarPainter(svgRoots[i], const Size(80, 80)),
-                  ),
+                Column(
+                  children: [
+                    Container(
+                      height: 80,
+                      width: 80,
+                      margin: const EdgeInsets.only(left: 10.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: CustomPaint(
+                        painter: AvatarPainter(svgRoots[i], const Size(80, 80)),
+                      ),
+                    ),
+                    Text(names[i]),
+                  ],
                 ),
             ],
           );
