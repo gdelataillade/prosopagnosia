@@ -8,6 +8,11 @@ import 'package:prosopagnosia/presentation/widget/puzzle_tile.dart';
 import 'package:prosopagnosia/service/drawable.dart';
 import 'package:prosopagnosia/service/storage.dart';
 
+// TODO: Mettre Getx state
+// Animations victoire
+// Timer ?
+// UI / UX
+
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
