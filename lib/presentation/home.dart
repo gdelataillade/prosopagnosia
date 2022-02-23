@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:prosopagnosia/presentation/avatar_painter.dart';
+import 'package:prosopagnosia/presentation/game.dart';
 import 'package:prosopagnosia/presentation/state.dart';
-import 'package:prosopagnosia/presentation/widget/puzzle_tile.dart';
-import 'package:prosopagnosia/presentation/widget/solved.dart';
-import 'package:prosopagnosia/service/drawable.dart';
-
-// TODO: Mettre Getx state
-// Animations victoire
-// Timer ?
-// UI / UX
+import 'package:prosopagnosia/presentation/trophies.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -30,114 +23,6 @@ class Home extends StatelessWidget {
                 : const Game(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class Trophies extends StatelessWidget {
-  const Trophies({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final state = Get.find<GameState>();
-    return Obx(() => state.svgRoots.isEmpty
-        ? const Text('You don\'t have any trophies yet...')
-        : Row(
-            children: [
-              for (var i = 0; i < state.svgRoots.length; i++)
-                Column(
-                  children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      margin: const EdgeInsets.only(left: 10.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: CustomPaint(
-                        painter: AvatarPainter(
-                            state.svgRoots[i], const Size(80, 80)),
-                      ),
-                    ),
-                    Text(state.names[i]),
-                  ],
-                ),
-            ],
-          ));
-  }
-}
-
-class Game extends StatelessWidget {
-  const Game({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final state = Get.find<GameState>();
-
-    return Obx(() => Column(
-          children: [
-            Center(
-              child: SizedBox(
-                height: tileSize,
-                width: tileSize,
-                child: state.puzzle.isEmpty
-                    ? const SizedBox.shrink()
-                    : state.step.value == GameStep.solved
-                        ? PuzzleSolved(name: state.avatarName)
-                        : SizedBox(
-                            height: 600,
-                            width: 600,
-                            child: Stack(
-                              children: [
-                                for (int i = 0; i < 9; i++)
-                                  AnimatedPuzzleTile(
-                                    key: UniqueKey(),
-                                    index: i,
-                                  ),
-                              ],
-                            ),
-                          ),
-              ),
-            ),
-            const SizedBox(height: 60),
-            RawMaterialButton(
-              fillColor: Colors.indigo,
-              onPressed: state.generateNewPuzzle,
-              child: const Text(
-                "New avatar",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ));
-  }
-}
-
-class AnimatedPuzzleTile extends StatelessWidget {
-  final int index;
-
-  const AnimatedPuzzleTile({Key? key, required this.index}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final state = Get.find<GameState>();
-
-    return Obx(
-      () => AnimatedPositioned(
-        top: 200 * (index ~/ 3).toDouble() +
-            (state.shiftingIdx == index ? state.yShift : 0),
-        left: 200 * (index % 3).toDouble() +
-            (state.shiftingIdx == index ? state.xShift : 0),
-        onEnd: () => state.onEndAnimation(index),
-        curve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: 150),
-        child: state.blankIdx == index
-            ? const SizedBox()
-            : PuzzleTile(
-                image: Image(image: state.puzzle[index]["image"].image),
-                onPressed: () => state.onTap(index),
-              ),
       ),
     );
   }

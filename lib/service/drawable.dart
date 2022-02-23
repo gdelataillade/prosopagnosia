@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:multiavatar/multiavatar.dart';
 import 'package:image/image.dart' as imglib;
 
-const tileSize = 600.0;
+const boardSize = 600.0;
 
 class DrawableTools {
   static Future<DrawableRoot> generateAvatar(String name) async {
@@ -26,8 +26,8 @@ class DrawableTools {
     const colorFilter = ColorFilter.mode(Color(0xFFDDDDDD), BlendMode.overlay);
     final image = await svgRoot
         .toPicture(
-            size: const Size(tileSize, tileSize), colorFilter: colorFilter)
-        .toImage(tileSize.toInt(), tileSize.toInt());
+            size: const Size(boardSize, boardSize), colorFilter: colorFilter)
+        .toImage(boardSize.toInt(), boardSize.toInt());
 
     try {
       final byteData = await image.toByteData(format: ImageByteFormat.png);

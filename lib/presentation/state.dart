@@ -128,11 +128,13 @@ class GameState extends GetxController {
   }
 
   void onTap(int index) {
+    const tileSize = boardSize / 3;
+
     if (isNextToBlank(index)) {
-      if (index + 1 == blankIdx) xShift = 198;
-      if (index - 1 == blankIdx) xShift = -198;
-      if (index + 3 == blankIdx) yShift = 198;
-      if (index - 3 == blankIdx) yShift = -198;
+      if (index + 1 == blankIdx) xShift = tileSize;
+      if (index - 1 == blankIdx) xShift = -tileSize;
+      if (index + 3 == blankIdx) yShift = tileSize;
+      if (index - 3 == blankIdx) yShift = -tileSize;
 
       shiftingIndex.value = index;
     }
