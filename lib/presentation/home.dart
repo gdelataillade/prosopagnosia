@@ -114,58 +114,29 @@ class Game extends StatelessWidget {
   }
 }
 
-class AnimatedPuzzleTile extends StatefulWidget {
+class AnimatedPuzzleTile extends StatelessWidget {
   final int index;
 
   const AnimatedPuzzleTile({Key? key, required this.index}) : super(key: key);
 
   @override
-  State<AnimatedPuzzleTile> createState() => _AnimatedPuzzleTileState();
-}
-
-class _AnimatedPuzzleTileState extends State<AnimatedPuzzleTile> {
-  final state = Get.find<GameState>();
-  double xShift = 0;
-  double yShift = 0;
-  int shiftingIndex = -1;
-
-  void onTap(int index) {
-    if (state.isNextToBlank(index)) {
-      setState(() {
-        if (index + 1 == state.blankIdx) xShift = 198;
-        if (index - 1 == state.blankIdx) xShift = -198;
-        if (index + 3 == state.blankIdx) yShift = 198;
-        if (index - 3 == state.blankIdx) yShift = -198;
-
-        shiftingIndex = index;
-      });
-    }
-  }
-
-  void onEndAnimation(int index) {
-    shiftingIndex = (-1);
-    xShift = 0;
-    yShift = 0;
-    state.swapTiles(index, state.blankIdx);
-    state.checkWin();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final state = Get.find<GameState>();
+
     return Obx(
       () => AnimatedPositioned(
-        top: 200 * (widget.index ~/ 3).toDouble() +
-            (shiftingIndex == widget.index ? yShift : 0),
-        left: 200 * (widget.index % 3).toDouble() +
-            (shiftingIndex == widget.index ? xShift : 0),
-        onEnd: () => onEndAnimation(widget.index),
+        top: 200 * (index ~/ 3).toDouble() +
+            (state.shiftingIdx == index ? state.yShift : 0),
+        left: 200 * (index % 3).toDouble() +
+            (state.shiftingIdx == index ? state.xShift : 0),
+        onEnd: () => state.onEndAnimation(index),
         curve: Curves.fastOutSlowIn,
         duration: const Duration(milliseconds: 150),
-        child: state.blankIdx == widget.index
+        child: state.blankIdx == index
             ? const SizedBox()
             : PuzzleTile(
-                image: Image(image: state.puzzle[widget.index]["image"].image),
-                onPressed: () => onTap(widget.index),
+                image: Image(image: state.puzzle[index]["image"].image),
+                onPressed: () => state.onTap(index),
               ),
       ),
     );

@@ -26,8 +26,12 @@ class GameState extends GetxController {
   RxList<Map<String, dynamic>> puzzle = <Map<String, dynamic>>[].obs;
   late String avatarName;
   late RxInt blankIndex;
+  RxInt shiftingIndex = (-1).obs;
+  double xShift = 0;
+  double yShift = 0;
 
   int get blankIdx => blankIndex.value;
+  int get shiftingIdx => shiftingIndex.value;
 
   @override
   void onInit() {
@@ -58,7 +62,7 @@ class GameState extends GetxController {
     puzzle.clear();
     blankIndex = 8.obs;
 
-    step = GameStep.game.obs;
+    step.value = GameStep.game;
 
     for (int i = 0; i < 9; i++) {
       puzzle.add(
@@ -77,7 +81,7 @@ class GameState extends GetxController {
       puzzle[lastTileIndex] = otherTile;
     }
 
-    step = GameStep.game.obs;
+    step.value = GameStep.game;
   }
 
   void shufflePuzzle() {
@@ -109,17 +113,36 @@ class GameState extends GetxController {
 
     puzzle[tileIndex] = puzzle[blankIdx];
     puzzle[blankIdx] = tmp;
-    blankIndex = tileIndex.obs;
+    blankIndex.value = tileIndex;
   }
 
   void checkWin() {
     for (int i = 0; i < 9; i++) {
       if (puzzle[i]["index"] != i) return;
     }
-    step = GameStep.solved.obs;
+    step.value = GameStep.solved;
     Storage.storeNewAvatar(avatarName);
     names.assignAll([...names, avatarName]);
     generateAvatars();
     print("PUZZLE SOLVED!");
+  }
+
+  void onTap(int index) {
+    if (isNextToBlank(index)) {
+      if (index + 1 == blankIdx) xShift = 198;
+      if (index - 1 == blankIdx) xShift = -198;
+      if (index + 3 == blankIdx) yShift = 198;
+      if (index - 3 == blankIdx) yShift = -198;
+
+      shiftingIndex.value = index;
+    }
+  }
+
+  void onEndAnimation(int index) {
+    shiftingIndex.value = -1;
+    xShift = 0;
+    yShift = 0;
+    swapTiles(index, blankIdx);
+    checkWin();
   }
 }
