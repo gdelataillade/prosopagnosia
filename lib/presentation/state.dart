@@ -6,17 +6,9 @@ import 'package:get/get.dart';
 import 'package:prosopagnosia/service/drawable.dart';
 import 'package:prosopagnosia/service/storage.dart';
 
-enum GameStep {
-  loading,
-  game,
-  solved,
-}
-
 class GameState extends GetxController {
   final random = Random();
   final faker = Faker();
-
-  Rx<GameStep> step = GameStep.loading.obs;
 
   // Trophies
   RxList<DrawableRoot> svgRoots = <DrawableRoot>[].obs;
@@ -24,6 +16,7 @@ class GameState extends GetxController {
 
   // Game
   RxList<Map<String, dynamic>> puzzle = <Map<String, dynamic>>[].obs;
+  RxBool isSolved = false.obs;
   late String avatarName;
   late RxInt blankIndex;
   RxInt shiftingIndex = (-1).obs;
@@ -54,8 +47,7 @@ class GameState extends GetxController {
 
   // Game
   Future<void> generateNewPuzzle() async {
-    step.value = GameStep.loading;
-
+    isSolved.value = false;
     avatarName = faker.person.firstName();
 
     final randomAvatar = await DrawableTools.generateRandomAvatar(avatarName);
@@ -63,8 +55,6 @@ class GameState extends GetxController {
 
     puzzle.clear();
     blankIndex = 8.obs;
-
-    step.value = GameStep.game;
 
     for (int i = 0; i < 9; i++) {
       puzzle.add(
@@ -82,8 +72,6 @@ class GameState extends GetxController {
       puzzle[blankIdx] = lastTile;
       puzzle[lastTileIndex] = otherTile;
     }
-
-    step.value = GameStep.game;
   }
 
   void shufflePuzzle() {
@@ -122,7 +110,7 @@ class GameState extends GetxController {
     for (int i = 0; i < 9; i++) {
       if (puzzle[i]["index"] != i) return;
     }
-    step.value = GameStep.solved;
+    isSolved.value = true;
     Storage.storeNewAvatar(avatarName);
     names.assignAll([...names, avatarName]);
     generateAvatars();

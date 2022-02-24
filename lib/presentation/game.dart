@@ -20,7 +20,7 @@ class Game extends StatelessWidget {
                 width: boardSize,
                 child: state.puzzle.isEmpty
                     ? const SizedBox.shrink()
-                    : state.step.value == GameStep.solved
+                    : state.isSolved.value
                         ? PuzzleSolved(name: state.avatarName)
                         : SizedBox(
                             height: 600,
