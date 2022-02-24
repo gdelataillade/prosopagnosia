@@ -54,6 +54,8 @@ class GameState extends GetxController {
 
   // Game
   Future<void> generateNewPuzzle() async {
+    step.value = GameStep.loading;
+
     avatarName = faker.person.firstName();
 
     final randomAvatar = await DrawableTools.generateRandomAvatar(avatarName);
@@ -124,7 +126,6 @@ class GameState extends GetxController {
     Storage.storeNewAvatar(avatarName);
     names.assignAll([...names, avatarName]);
     generateAvatars();
-    print("PUZZLE SOLVED!");
   }
 
   void onTap(int index) {

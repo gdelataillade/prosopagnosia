@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prosopagnosia/presentation/state.dart';
 import 'package:prosopagnosia/presentation/widget/animated_puzzle_tile.dart';
+import 'package:prosopagnosia/presentation/widget/restart_button.dart';
 import 'package:prosopagnosia/presentation/widget/solved.dart';
 import 'package:prosopagnosia/service/drawable.dart';
 
@@ -37,14 +38,7 @@ class Game extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 60),
-            RawMaterialButton(
-              fillColor: Colors.indigo,
-              onPressed: state.generateNewPuzzle,
-              child: const Text(
-                "New avatar",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+            const RestartButton(),
           ],
         ));
   }

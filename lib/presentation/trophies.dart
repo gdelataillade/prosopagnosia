@@ -14,23 +14,27 @@ class Trophies extends StatelessWidget {
         : Row(
             children: [
               for (var i = 0; i < state.svgRoots.length; i++)
-                Column(
-                  children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      margin: const EdgeInsets.only(left: 10.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 80,
+                        width: 80,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CustomPaint(
+                          painter: AvatarPainter(
+                              state.svgRoots[i], const Size(80, 80)),
+                        ),
                       ),
-                      child: CustomPaint(
-                        painter: AvatarPainter(
-                            state.svgRoots[i], const Size(80, 80)),
-                      ),
-                    ),
-                    Text(state.names[i]),
-                  ],
+                      const SizedBox(height: 5),
+                      Text(state.names[i]),
+                    ],
+                  ),
                 ),
             ],
           ));

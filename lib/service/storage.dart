@@ -11,7 +11,6 @@ class Storage {
   static List<String> getStoredAvatar() {
     final box = getBox();
 
-    print("Storage: ${box.values.toList()}");
     return box.values.map((e) => e.toString()).toList();
   }
 
@@ -19,6 +18,5 @@ class Storage {
     final box = getBox();
 
     box.put(getNbAvatars(), name);
-    print("Storage: ${box.values.toList()}");
   }
 }
